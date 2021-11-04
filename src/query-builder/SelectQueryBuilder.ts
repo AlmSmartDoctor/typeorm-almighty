@@ -52,14 +52,41 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
      * Gets generated sql query without parameters being replaced.
      */
     getQuery(): string {
+        const connectionOptions = this.connection.options;
+        const isLegacyMsSql = connectionOptions.type === "mssql"
+            && connectionOptions.compatibilityLevel !== undefined
+            && connectionOptions.compatibilityLevel < 110;
+
+        let offset: number|undefined = this.expressionMap.offset,
+            limit: number|undefined = this.expressionMap.limit;
+        if (!offset && !limit && this.expressionMap.joinAttributes.length === 0) {
+            offset = this.expressionMap.skip;
+            limit = this.expressionMap.take;
+        }
+
+        const isPaginated = offset !== undefined || limit !== undefined;
+
         let sql = this.createComment();
-        sql += this.createSelectExpression();
+        sql += this.createSelectExpression(isLegacyMsSql && isPaginated);
         sql += this.createJoinExpression();
         sql += this.createWhereExpression();
         sql += this.createGroupByExpression();
         sql += this.createHavingExpression();
-        sql += this.createOrderByExpression();
-        sql += this.createLimitOffsetExpression();
+
+        if(isLegacyMsSql && isPaginated) {
+            sql = `SELECT * FROM (${sql}) AS PAGINATION_TEMP_TABLE`;
+            if(offset && limit)
+                sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`;
+            if(offset)
+                sql += ` WHERE __PAGINATION_ROW_NUMBER__ > ${offset}`;
+            if(limit)
+                sql += ` WHERE __PAGINATION_ROW_NUMBER__ <= ${limit}`;
+            sql += " ORDER BY __PAGINATION_ROW_NUMBER__";
+        } else {
+            sql += this.createOrderByExpression();
+            sql += this.createLimitOffsetExpression();
+        }
+
         sql += this.createLockExpression();
         sql = sql.trim();
         if (this.expressionMap.subQuery)
@@ -1385,7 +1412,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
     /**
      * Creates "SELECT FROM" part of SQL query.
      */
-    protected createSelectExpression() {
+    protected createSelectExpression(selectRowNumber?: boolean) {
 
         if (!this.expressionMap.mainAlias)
             throw new TypeORMError("Cannot build query because main alias is not set (call qb#from method)");
@@ -1394,6 +1421,15 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
 
         const allSelects: SelectQuery[] = [];
         const excludedSelects: SelectQuery[] = [];
+
+        if(selectRowNumber) {
+            const isOrderByEmpty = Object.keys(this.expressionMap.orderBys).length === 0;
+            allSelects.push({
+                aliasName: "__PAGINATION_ROW_NUMBER__",
+                selection: `ROW_NUMBER() OVER(${isOrderByEmpty ? "ORDER BY (SELECT NULL)" : this.createOrderByExpression()})`,
+                virtual: false
+            });
+        }
 
         if (this.expressionMap.mainAlias.hasMetadata) {
             const metadata = this.expressionMap.mainAlias.metadata;

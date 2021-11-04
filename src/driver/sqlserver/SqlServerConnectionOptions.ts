@@ -40,6 +40,11 @@ export interface SqlServerConnectionOptions extends BaseConnectionOptions, SqlSe
     readonly driver?: any;
 
     /**
+     * MSSQL compatibility level
+     */
+    readonly compatibilityLevel?: number;
+
+    /**
      * An optional object/dictionary with the any of the properties
      */
     readonly pool?: {
