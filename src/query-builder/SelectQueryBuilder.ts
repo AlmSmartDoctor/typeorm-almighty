@@ -1,4 +1,5 @@
 import {SapDriver} from "../driver/sap/SapDriver";
+import { SqlServerConnectionOptions } from "../driver/sqlserver/SqlServerConnectionOptions";
 import {RawSqlResultsToEntityTransformer} from "./transformer/RawSqlResultsToEntityTransformer";
 import {ObjectLiteral} from "../common/ObjectLiteral";
 import {SqlServerDriver} from "../driver/sqlserver/SqlServerDriver";
@@ -1911,17 +1912,26 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             // characteristic for concatenating, so we gotta use the `CONCAT` function.
             // However, If it's exactly 1 column we can omit the `CONCAT` for better performance.
 
-            const columnsExpression = primaryColumns.map(
-                primaryColumn => `${distinctAlias}.${this.escape(primaryColumn.databaseName)}`
-            ).join(", '|;|', ");
+            const compatibilityLevel = (this.connection.options as SqlServerConnectionOptions).compatibilityLevel;
 
-            if (primaryColumns.length === 1) {
+            // Legacy mssql does not have CONCAT function
+            if (compatibilityLevel !== undefined && compatibilityLevel <= 100) {
+                const columnsExpression = primaryColumns.map(
+                    primaryColumn => `${distinctAlias}.${this.escape(primaryColumn.databaseName)}`
+                ).join(" + '|;|' + ");
 
                 return `COUNT(DISTINCT(${columnsExpression}))`;
+            } else {
+                const columnsExpression = primaryColumns.map(
+                    primaryColumn => `${distinctAlias}.${this.escape(primaryColumn.databaseName)}`
+                ).join(", '|;|', ");
+
+                if (primaryColumns.length === 1) {
+                    return `COUNT(DISTINCT(${columnsExpression}))`;
+                }
+
+                return `COUNT(DISTINCT(CONCAT(${columnsExpression})))`;
             }
-
-            return `COUNT(DISTINCT(CONCAT(${columnsExpression})))`;
-
         }
 
         // If all else fails, fall back to a `COUNT` and `DISTINCT` across all the primary columns concatenated.
