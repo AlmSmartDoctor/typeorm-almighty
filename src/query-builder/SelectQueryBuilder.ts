@@ -65,27 +65,28 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             limit = this.expressionMap.take;
         }
 
-        const isPaginated = offset !== undefined || limit !== undefined;
-
         let sql = this.createComment();
-        sql += this.createSelectExpression(isLegacyMsSql && isPaginated);
+        sql += this.createSelectExpression({
+            selectRowNumber: isLegacyMsSql && offset !== undefined && offset !== 0,
+            selectTop: isLegacyMsSql ? offset : undefined,
+        });
         sql += this.createJoinExpression();
         sql += this.createWhereExpression();
         sql += this.createGroupByExpression();
         sql += this.createHavingExpression();
 
-        if(isLegacyMsSql && isPaginated) {
+        if(isLegacyMsSql && offset) {
             sql = `SELECT * FROM (${sql}) AS PAGINATION_TEMP_TABLE`;
-            if(offset && limit)
+            if(limit !== undefined)
                 sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`;
-            if(offset)
+            else
                 sql += ` WHERE __PAGINATION_ROW_NUMBER__ > ${offset}`;
-            if(limit)
-                sql += ` WHERE __PAGINATION_ROW_NUMBER__ <= ${limit}`;
             sql += " ORDER BY __PAGINATION_ROW_NUMBER__";
         } else {
             sql += this.createOrderByExpression();
-            sql += this.createLimitOffsetExpression();
+
+            if(!isLegacyMsSql)
+                sql += this.createLimitOffsetExpression();
         }
 
         sql += this.createLockExpression();
@@ -1424,7 +1425,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
     /**
      * Creates "SELECT FROM" part of SQL query.
      */
-    protected createSelectExpression(selectRowNumber?: boolean) {
+    protected createSelectExpression({selectRowNumber, selectTop}: {selectRowNumber: boolean; selectTop?: number;}) {
 
         if (!this.expressionMap.mainAlias)
             throw new TypeORMError("Cannot build query because main alias is not set (call qb#from method)");
@@ -1507,7 +1508,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                 return this.getTableName(alias.tablePath!) + " " + this.escape(alias.name);
             });
 
-        const select = this.createSelectDistinctExpression();
+        const select = this.createSelectDistinctExpression(selectTop);
         const selection = allSelects.map(select => select.selection + (select.aliasName ? " AS " + this.escape(select.aliasName) : "")).join(", ");
 
         return select + selection + " FROM " + froms.join(", ") + lock + useIndex;
@@ -1516,7 +1517,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
     /**
      * Creates select | select distinct part of SQL query.
      */
-    protected createSelectDistinctExpression(): string {
+    protected createSelectDistinctExpression(selectTop?: number): string {
         const {selectDistinct, selectDistinctOn, maxExecutionTime} = this.expressionMap;
         const {driver} = this.connection;
 
@@ -1528,14 +1529,17 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             }
         }
 
+        if (selectTop !== undefined)
+            select += `TOP ${selectTop} `;
+
         if (driver instanceof PostgresDriver && selectDistinctOn.length > 0) {
             const selectDistinctOnMap = selectDistinctOn.map(
               (on) => this.replacePropertyNames(on)
             ).join(", ");
 
-            select = `SELECT DISTINCT ON (${selectDistinctOnMap}) `;
+            select += `DISTINCT ON (${selectDistinctOnMap}) `;
         } else if (selectDistinct) {
-            select = "SELECT DISTINCT ";
+            select += "DISTINCT ";
         }
 
         return select;
