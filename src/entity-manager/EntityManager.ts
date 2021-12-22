@@ -376,7 +376,7 @@ export class EntityManager {
             .then(() => entity);
     }
 
-    private static auditUserId = 'TypeormAlm';
+    private static auditUserId = 'UniTypeORM';
     private static getAuditLoggingDate(): string {
         const date = new Date();
         const year = date.getFullYear();
