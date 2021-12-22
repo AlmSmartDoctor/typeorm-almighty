@@ -34,10 +34,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AlmSmartDoctor/typeorm-legacy-mssql.git"
+    "url": "https://github.com/AlmSmartDoctor/typeorm-almighty.git"
   },
   "bugs": {
-    "url": "https://github.com/AlmSmartDoctor/typeorm-legacy-mssql/issues"
+    "url": "https://github.com/AlmSmartDoctor/typeorm-almighty/issues"
   },
   "tags": [
     "orm",
