@@ -229,6 +229,9 @@
       "src/**"
     ],
     "reporter": "json"
+  },
+  "homepage": "https://github.com/AlmSmartDoctor/typeorm-almighty#readme",
+  "directories": {
     "doc": "docs",
     "test": "test"
   }
