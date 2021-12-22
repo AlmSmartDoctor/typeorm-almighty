@@ -334,38 +334,32 @@ export class EntityManager {
                 return Promise.resolve(entity);
 
             for (const e of entity) {
-                // @ts-ignore
-                if ('modifyUserId' in e && e.modifyUserId === undefined) {
+                if ('modifyUserId' in e) {
                     // @ts-ignore
                     e.modifyUserId = EntityManager.auditUserId;
                 }
-                // @ts-ignore
-                if ('modifyDate' in e && e.modifyDate === undefined) {
+                if ('modifyDate' in e) {
                     // @ts-ignore
                     e.modifyDate = EntityManager.getAuditLoggingDate();
                 }
-                // @ts-ignore
-                if ('modifyTime' in e && e.modifyTime === undefined) {
+                if ('modifyTime' in e) {
                     // @ts-ignore
                     e.modifyTime = EntityManager.getAuditLoggingTime();
                 }
             }
         }
         else {
-            // @ts-ignore
-            if ('modifyUserId' in e && e.modifyUserId === undefined) {
+            if ('modifyUserId' in entity) {
                 // @ts-ignore
-                e.modifyUserId = EntityManager.auditUserId;
+                entity.modifyUserId = EntityManager.auditUserId;
             }
-            // @ts-ignore
-            if ('modifyDate' in e && e.modifyDate === undefined) {
+            if ('modifyDate' in entity) {
                 // @ts-ignore
-                e.modifyDate = EntityManager.getAuditLoggingDate();
+                entity.modifyDate = EntityManager.getAuditLoggingDate();
             }
-            // @ts-ignore
-            if ('modifyTime' in e && e.modifyTime === undefined) {
+            if ('modifyTime' in entity) {
                 // @ts-ignore
-                e.modifyTime = EntityManager.getAuditLoggingTime();
+                entity.modifyTime = EntityManager.getAuditLoggingTime();
             }
         }
 
