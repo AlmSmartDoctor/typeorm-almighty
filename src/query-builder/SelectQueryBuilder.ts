@@ -68,7 +68,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
         let sql = this.createComment();
         sql += this.createSelectExpression({
             selectRowNumber: isLegacyMsSql && offset !== undefined && offset !== 0,
-            selectTop: isLegacyMsSql ? offset : undefined,
+            selectTop: isLegacyMsSql ? limit : undefined,
         });
         sql += this.createJoinExpression();
         sql += this.createWhereExpression();
