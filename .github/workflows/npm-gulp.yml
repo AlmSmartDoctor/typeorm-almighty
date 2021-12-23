@@ -25,7 +25,6 @@ jobs:
     - name: Build
       run: |
         npm install
-        gulp packageCompile
-        gulp packagePublish
+        gulp publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
