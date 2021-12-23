@@ -2,8 +2,10 @@ name: NodeJS with Gulp
 
 on:
   push:
-    tags:        
-      - '*'           # Push events to every tag not containing /
+    branches: [ master ]
+
+#    tags:
+#      - '*'           # Push events to every tag not containing /
 #      - '**'          # Use this if you want to catch every tag including hierarchical tags like v1.0/beta
 
 jobs:
@@ -12,17 +14,21 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
-    
+        node-version: ['16.x']
+
     steps:
     - uses: actions/checkout@v2
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
+        registry-url: https://registry.npmjs.org/
+        scope: '@alm1983'
 
     - name: Build
       run: |
         npm install
-        gulp
+        gulp publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
