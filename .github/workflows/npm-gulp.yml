@@ -2,7 +2,7 @@ name: NodeJS with Gulp
 
 on:
   push:
-    tags:        
+    tags:
       - '*'           # Push events to every tag not containing /
 #      - '**'          # Use this if you want to catch every tag including hierarchical tags like v1.0/beta
 
@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         node-version: ['14.x']
-    
+
     steps:
     - uses: actions/checkout@v2
 
@@ -27,4 +27,4 @@ jobs:
         npm install
         gulp publish
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
