@@ -2,7 +2,7 @@ name: NodeJS with Gulp
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, feature/npm-publish ]
 
 #    tags:
 #      - '*'           # Push events to every tag not containing /
@@ -24,7 +24,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: https://registry.npmjs.org/
-        scope: '@alm1983'
 
     - name: Build
       run: |
