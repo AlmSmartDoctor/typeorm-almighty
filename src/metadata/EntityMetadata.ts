@@ -274,8 +274,6 @@ export class EntityMetadata {
     /**
      * Gets entity column which contains an update date value.
      */
-    updateDateColumn?: ColumnMetadata;
-
     updateDateColumns?: ColumnMetadata[];
 
     /**

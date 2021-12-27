@@ -262,8 +262,10 @@ export class SubjectExecutor {
                         subject.entity[subject.metadata.createDateColumn.databaseName] = new Date();
                     }
 
-                    if (subject.metadata.updateDateColumn && subject.entity) {
-                        subject.entity[subject.metadata.updateDateColumn.databaseName] = new Date();
+                    if (subject.entity) {
+                        subject.metadata.updateDateColumns?.forEach(updateDateColumn => {
+                            subject.entity![updateDateColumn.databaseName] = new Date();
+                        });
                     }
 
                     subject.createValueSetAndPopChangeMap();
@@ -397,9 +399,9 @@ export class SubjectExecutor {
                     delete partialEntity[subject.metadata.createDateColumn.propertyName];
                 }
 
-                if (subject.metadata.updateDateColumn && subject.metadata.updateDateColumn.propertyName) {
-                    partialEntity[subject.metadata.updateDateColumn.propertyName] = new Date();
-                }
+                subject.metadata.updateDateColumns?.forEach(updateDateColumn => {
+                    partialEntity[updateDateColumn.propertyName] = new Date();
+                });
 
                 const manager = this.queryRunner.manager as MongoEntityManager;
 
@@ -575,9 +577,9 @@ export class SubjectExecutor {
                     delete partialEntity[subject.metadata.createDateColumn.propertyName];
                 }
 
-                if (subject.metadata.updateDateColumn && subject.metadata.updateDateColumn.propertyName) {
-                    partialEntity[subject.metadata.updateDateColumn.propertyName] = new Date();
-                }
+                subject.metadata.updateDateColumns?.forEach(updateDateColumn => {
+                    partialEntity[updateDateColumn.propertyName] = new Date();
+                });
 
                 if (subject.metadata.deleteDateColumn && subject.metadata.deleteDateColumn.propertyName) {
                     partialEntity[subject.metadata.deleteDateColumn.propertyName] = new Date();
@@ -658,9 +660,9 @@ export class SubjectExecutor {
                     delete partialEntity[subject.metadata.createDateColumn.propertyName];
                 }
 
-                if (subject.metadata.updateDateColumn && subject.metadata.updateDateColumn.propertyName) {
-                    partialEntity[subject.metadata.updateDateColumn.propertyName] = new Date();
-                }
+                subject.metadata.updateDateColumns?.forEach(updateDateColumn => {
+                    partialEntity[updateDateColumn.propertyName] = new Date();
+                });
 
                 if (subject.metadata.deleteDateColumn && subject.metadata.deleteDateColumn.propertyName) {
                     partialEntity[subject.metadata.deleteDateColumn.propertyName] = null;

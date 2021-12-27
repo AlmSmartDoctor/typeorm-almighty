@@ -651,7 +651,6 @@ export class EntityMetadataBuilder {
         entityMetadata.hasUUIDGeneratedColumns = entityMetadata.columns.filter(column => column.isGenerated || column.generationStrategy === "uuid").length > 0;
         entityMetadata.createDateColumn = entityMetadata.columns.find(column => column.isCreateDate);
         entityMetadata.updateDateColumns = entityMetadata.columns.filter(column => column.isUpdateDate);
-        entityMetadata.updateDateColumn = [entityMetadata.updateDateColumns];
         entityMetadata.deleteDateColumn = entityMetadata.columns.find(column => column.isDeleteDate);
         entityMetadata.versionColumn = entityMetadata.columns.find(column => column.isVersion);
         entityMetadata.discriminatorColumn = entityMetadata.columns.find(column => column.isDiscriminator);
