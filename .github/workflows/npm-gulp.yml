@@ -2,8 +2,6 @@ name: NodeJS with Gulp
 
 on:
   push:
-    branches: [ master ]
-
     tags:
       - '*'           # Push events to every tag not containing /
 #      - '**'          # Use this if you want to catch every tag including hierarchical tags like v1.0/beta
