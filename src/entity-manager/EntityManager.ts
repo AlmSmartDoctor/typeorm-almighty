@@ -328,67 +328,14 @@ export class EntityManager {
         if (target instanceof EntitySchema)
             target = target.options.name;
 
-        if (Array.isArray(entity)) {
-            // if user passed empty array of entities then we don't need to do anything
-            if (entity.length === 0)
-                return Promise.resolve(entity);
-
-            for (const e of entity) {
-                if ('modifyUserId' in e) {
-                    // @ts-ignore
-                    e.modifyUserId = EntityManager.auditUserId;
-                }
-                if ('modifyDate' in e) {
-                    // @ts-ignore
-                    e.modifyDate = EntityManager.getAuditLoggingDate();
-                }
-                if ('modifyTime' in e) {
-                    // @ts-ignore
-                    e.modifyTime = EntityManager.getAuditLoggingTime();
-                }
-            }
-        }
-        else {
-            if ('modifyUserId' in entity) {
-                // @ts-ignore
-                entity.modifyUserId = EntityManager.auditUserId;
-            }
-            if ('modifyDate' in entity) {
-                // @ts-ignore
-                entity.modifyDate = EntityManager.getAuditLoggingDate();
-            }
-            if ('modifyTime' in entity) {
-                // @ts-ignore
-                entity.modifyTime = EntityManager.getAuditLoggingTime();
-            }
-        }
-
+        // if user passed empty array of entities then we don't need to do anything
+        if (Array.isArray(entity) && entity.length === 0)
+            return Promise.resolve(entity);
 
         // execute save operation
         return new EntityPersistExecutor(this.connection, this.queryRunner, "save", target, entity, options)
             .execute()
             .then(() => entity);
-    }
-
-    private static auditUserId = 'UniTypeORM';
-    private static getAuditLoggingDate(): string {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1);
-        const paddedMonth = month < 10 ? '0' + month : month.toString();
-        const dateOfMonth = date.getDate();
-        const paddedDateOfMonth = dateOfMonth < 10 ? '0' + dateOfMonth: dateOfMonth.toString();
-
-        return year.toString() + paddedMonth + paddedDateOfMonth;
-    }
-    private static getAuditLoggingTime(): string {
-        const date = new Date();
-        const hours = date.getHours();
-        const paddedHours = hours < 10 ? '0' + hours : hours.toString();
-        const minutes = date.getMinutes();
-        const paddedMinutes = minutes < 10 ? '0' + minutes: minutes.toString();
-
-        return paddedHours + paddedMinutes;
     }
 
     /**

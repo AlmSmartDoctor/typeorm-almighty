@@ -392,7 +392,7 @@ export class UpdateQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                     throw new EntityColumnNotFound(propertyPath);
                 }
 
-                columns.forEach(column => {
+                columns.concat(metadata.updateDateColumns ?? []).forEach(column => {
                     if (!column.isUpdate) { return; }
                     updatedColumns.push(column);
 
@@ -445,8 +445,6 @@ export class UpdateQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             if (updateColumnAndValues.length > 0 || Object.keys(valuesSet).length === 0) {
                 if (metadata.versionColumn && updatedColumns.indexOf(metadata.versionColumn) === -1)
                     updateColumnAndValues.push(this.escape(metadata.versionColumn.databaseName) + " = " + this.escape(metadata.versionColumn.databaseName) + " + 1");
-                if (metadata.updateDateColumn && updatedColumns.indexOf(metadata.updateDateColumn) === -1)
-                    updateColumnAndValues.push(this.escape(metadata.updateDateColumn.databaseName) + " = CURRENT_TIMESTAMP"); // todo: fix issue with CURRENT_TIMESTAMP(6) being used, can "DEFAULT" be used?!
             }
         } else {
             Object.keys(valuesSet).map(key => {

@@ -1136,7 +1136,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             const metadata = this.expressionMap.mainAlias!.metadata;
 
             if (this.expressionMap.lockVersion instanceof Date) {
-                const actualVersion = metadata.updateDateColumn!.getEntityValue(result); // what if columns arent set?
+                const actualVersion = metadata.updateDateColumns![0].getEntityValue(result); // what if columns arent set?
                 if (actualVersion.getTime() !== this.expressionMap.lockVersion.getTime())
                     throw new OptimisticLockVersionMismatchError(metadata.name, this.expressionMap.lockVersion, actualVersion);
 
@@ -2003,7 +2003,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
 
         if (this.expressionMap.lockMode === "optimistic") {
             const metadata = this.expressionMap.mainAlias.metadata;
-            if (!metadata.versionColumn && !metadata.updateDateColumn)
+            if (!metadata.versionColumn && !metadata.updateDateColumns)
                 throw new NoVersionOrUpdateDateColumnError(metadata.name);
         }
 

@@ -274,7 +274,7 @@ export class EntityMetadata {
     /**
      * Gets entity column which contains an update date value.
      */
-    updateDateColumn?: ColumnMetadata;
+    updateDateColumns?: ColumnMetadata[];
 
     /**
      * Gets entity column which contains a delete date value.

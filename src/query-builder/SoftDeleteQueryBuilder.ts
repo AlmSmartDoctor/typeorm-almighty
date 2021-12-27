@@ -371,8 +371,9 @@ export class SoftDeleteQueryBuilder<Entity> extends QueryBuilder<Entity> impleme
         }
         if (metadata.versionColumn)
             updateColumnAndValues.push(this.escape(metadata.versionColumn.databaseName) + " = " + this.escape(metadata.versionColumn.databaseName) + " + 1");
-        if (metadata.updateDateColumn)
-            updateColumnAndValues.push(this.escape(metadata.updateDateColumn.databaseName) + " = CURRENT_TIMESTAMP"); // todo: fix issue with CURRENT_TIMESTAMP(6) being used, can "DEFAULT" be used?!
+        metadata.updateDateColumns?.forEach(updateDateColumn => {
+            updateColumnAndValues.push(this.escape(updateDateColumn.databaseName) + " = CURRENT_TIMESTAMP"); // todo: fix issue with CURRENT_TIMESTAMP(6) being used, can "DEFAULT" be used?!
+        });
 
         if (updateColumnAndValues.length <= 0) {
             throw new UpdateValuesMissingError();
