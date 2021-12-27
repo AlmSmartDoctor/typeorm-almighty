@@ -1540,7 +1540,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
         } else if (selectDistinct) {
             select += "DISTINCT ";
         } else if (selectTop) {
-            select += `TOP ${selectTop}`;
+            select += `TOP ${selectTop} `;
         }
 
         return select;
