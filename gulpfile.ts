@@ -116,7 +116,7 @@ export class Gulpfile {
                 "cd ./build/package && npm publish"
             ]));
     }
-    
+
     /**
      * Packs a .tgz from ./build/package directory.
      */
@@ -221,6 +221,15 @@ export class Gulpfile {
     }
 
     /**
+     * Copy npmrc into the package.
+     */
+    @Task()
+    packageCopyNpmrc() {
+        return gulp.src(".npmrc")
+            .pipe(gulp.dest("./build/package"));
+    }
+
+    /**
      * Creates a package that can be published to npm.
      */
     @SequenceTask()
@@ -236,7 +245,8 @@ export class Gulpfile {
                 "packageReplaceReferences",
                 "packagePreparePackageFile",
                 "packageCopyReadme",
-                "packageCopyShims"
+                "packageCopyShims",
+                "packageCopyNpmrc",
             ],
         ];
     }

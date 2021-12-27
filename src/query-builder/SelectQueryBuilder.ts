@@ -1529,17 +1529,18 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             }
         }
 
-        if (selectTop !== undefined)
-            select += `TOP ${selectTop} `;
-
         if (driver instanceof PostgresDriver && selectDistinctOn.length > 0) {
             const selectDistinctOnMap = selectDistinctOn.map(
               (on) => this.replacePropertyNames(on)
             ).join(", ");
 
             select += `DISTINCT ON (${selectDistinctOnMap}) `;
+        } else if (selectDistinct && selectTop) {
+            select += `DISTINCT TOP ${selectTop} `;
         } else if (selectDistinct) {
             select += "DISTINCT ";
+        } else if (selectTop) {
+            select += `TOP ${selectTop}`;
         }
 
         return select;
