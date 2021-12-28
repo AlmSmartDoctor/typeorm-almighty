@@ -393,7 +393,7 @@ export class UpdateQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                     throw new EntityColumnNotFound(propertyPath);
                 }
 
-                (isFirstIteration && metadata.updateDateColumns? columns.concat(metadata.updateDateColumns): columns).forEach(column => {
+                (isFirstIteration? columns.concat(metadata.updateDateColumns ?? []): columns).forEach(column => {
                     if (!column.isUpdate) { return; }
                     updatedColumns.push(column);
 
