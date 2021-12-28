@@ -383,6 +383,7 @@ export class UpdateQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
         // prepare columns and values to be updated
         const updateColumnAndValues: string[] = [];
         const updatedColumns: ColumnMetadata[] = [];
+        let isFirstIteration = true;
         if (metadata) {
             this.createPropertyPath(metadata, valuesSet).forEach(propertyPath => {
                 // todo: make this and other query builder to work with properly with tables without metadata
@@ -392,7 +393,7 @@ export class UpdateQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                     throw new EntityColumnNotFound(propertyPath);
                 }
 
-                columns.forEach(column => {
+                (isFirstIteration && metadata.updateDateColumns? columns.concat(metadata.updateDateColumns): columns).forEach(column => {
                     if (!column.isUpdate) { return; }
                     updatedColumns.push(column);
 
@@ -439,6 +440,8 @@ export class UpdateQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                         updateColumnAndValues.push(this.escape(column.databaseName) + " = " + expression);
                     }
                 });
+
+                isFirstIteration = false;
             });
 
             // Don't allow calling update only with columns that are `update: false`
