@@ -2044,8 +2044,8 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             });
 
             rawResults = await new SelectQueryBuilder(this.connection, queryRunner)
-                .distinctOn(querySelects)
-                .select(querySelects.join(", "))
+                .distinct(true)
+                .select(querySelects)
                 .addSelect(selects)
                 .from(`(${this.clone().orderBy().getQuery()})`, "distinctAlias")
                 .offset(this.expressionMap.skip)
