@@ -76,6 +76,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
         sql += this.createHavingExpression();
 
         if(isLegacyMsSql && offset) {
+            sql += this.createOrderByExpression();
             sql = `SELECT * FROM (${sql}) AS PAGINATION_TEMP_TABLE`;
             if(limit !== undefined)
                 sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`;
