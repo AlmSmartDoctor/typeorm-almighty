@@ -1,22 +1,22 @@
-import { Entity, ObjectID, ObjectIdColumn, Column } from "../../../../src";
+import { Entity, ObjectId, ObjectIdColumn, Column } from "../../../../src"
 
 @Entity("warnings")
 export class Warn {
     @ObjectIdColumn()
-    id!: ObjectID
+    id!: ObjectId
 
     @Column()
-    guild!: string;
+    guild!: string
 
     @Column()
-    user!: string;
+    user!: string
 
     @Column()
-    moderator!: string;
+    moderator!: string
 
     @Column()
-    reason!: string;
+    reason!: string
 
     @Column()
-    createdAt!: Date;
+    createdAt!: Date
 }
