@@ -98,7 +98,6 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
             selectRowNumber: isLegacyMsSql && offset !== undefined && offset !== 0,
             selectTop: isLegacyMsSql && !offset ? limit : undefined,
         });
-        sql += this.createSelectExpression()
         sql += this.createJoinExpression()
         sql += this.createWhereExpression()
         sql += this.createGroupByExpression()
@@ -1740,13 +1739,13 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                 metadata.updateDateColumns![0].getEntityValue(result) // what if columns arent set?
                 if (
                     actualVersion.getTime() !==
-                     this.expressionMap.lockVersion.getTime()
+        this.expressionMap.lockVersion.getTime()
                      )
                     throw new OptimisticLockVersionMismatchError(
                         metadata.name,
                          this.expressionMap.lockVersion,
-                          actualVersion,
-                          )
+        actualVersion,
+)
 
             } else {
                 const actualVersion =
@@ -3524,7 +3523,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
             rawResults = await new SelectQueryBuilder(
                 this.connection,
                  queryRunner,
-                 )
+                        )
                 .distinct(true)
                 .select(`DISTINCT ${querySelects.join(", ")}`)
                 .addSelect(selects)
