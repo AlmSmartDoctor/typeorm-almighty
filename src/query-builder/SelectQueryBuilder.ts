@@ -96,14 +96,13 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
         let sql = this.createComment()
         sql += this.createSelectExpression({
             selectRowNumber: isLegacyMsSql && offset !== undefined && offset !== 0,
-            selectTop: isLegacyMsSql && !offset ? limit : undefined,
         });
         sql += this.createJoinExpression()
         sql += this.createWhereExpression()
         sql += this.createGroupByExpression()
         sql += this.createHavingExpression()
 
-        if (isLegacyMsSql && offset) {
+        if (isLegacyMsSql && offset != undefined) {
             sql += this.createOrderByExpression()
             sql = `SELECT *
                    FROM (${sql}) AS PAGINATION_TEMP_TABLE`
@@ -2127,7 +2126,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
     /**
      * Creates "SELECT FROM" part of SQL query.
      */
-    protected createSelectExpression({selectRowNumber, selectTop}: { selectRowNumber: boolean; selectTop?: number; }) {
+    protected createSelectExpression({selectRowNumber}: { selectRowNumber: boolean; }) {
 
         if (!this.expressionMap.mainAlias)
             throw new TypeORMError(
@@ -2234,7 +2233,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                 )
             })
 
-        const select = this.createSelectDistinctExpression(selectTop)
+        const select = this.createSelectDistinctExpression()
         const selection = allSelects
             .map(
                 (select) =>
@@ -2258,7 +2257,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
     /**
      * Creates select | select distinct part of SQL query.
      */
-    protected createSelectDistinctExpression(selectTop?: number): string {
+    protected createSelectDistinctExpression(): string {
         const {selectDistinct, selectDistinctOn, maxExecutionTime} = this.expressionMap;
         const {driver} = this.connection;
 
