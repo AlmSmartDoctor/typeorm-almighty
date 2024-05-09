@@ -3520,7 +3520,6 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                 this.connection,
                  queryRunner,
                         )
-                .distinct(true)
                 .select(`DISTINCT ${querySelects.join(", ")}`)
                 .addSelect(selects)
                 .from(
