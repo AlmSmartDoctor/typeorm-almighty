@@ -95,7 +95,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
 
         let sql = this.createComment()
         sql += this.createSelectExpression({
-            selectRowNumber: isLegacyMsSql && offset !== undefined && offset !== 0,
+            selectRowNumber: isLegacyMsSql && offset !== undefined
         });
         sql += this.createJoinExpression()
         sql += this.createWhereExpression()
