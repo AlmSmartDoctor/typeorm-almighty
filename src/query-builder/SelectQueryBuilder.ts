@@ -102,7 +102,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
         sql += this.createGroupByExpression()
         sql += this.createHavingExpression()
 
-        if (isLegacyMsSql && offset != undefined) {
+        if (isLegacyMsSql && offset !== undefined) {
             sql += this.createOrderByExpression()
             sql = `SELECT *
                    FROM (${sql}) AS PAGINATION_TEMP_TABLE`
