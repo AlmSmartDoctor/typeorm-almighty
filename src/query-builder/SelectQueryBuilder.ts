@@ -95,27 +95,26 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
 
         let sql = this.createComment()
         sql += this.createSelectExpression({
-            selectRowNumber: isLegacyMsSql && offset !== undefined
+            selectRowNumber: isLegacyMsSql && (offset !== undefined || limit !== undefined),
         });
         sql += this.createJoinExpression()
         sql += this.createWhereExpression()
         sql += this.createGroupByExpression()
         sql += this.createHavingExpression()
 
-        if (isLegacyMsSql && offset !== undefined) {
+        if (isLegacyMsSql && (offset !== undefined || limit !== undefined)) {
+            offset = offset === undefined ? 0 : offset
+            limit = limit === undefined ? 99999 : limit
+
             sql += this.createOrderByExpression()
-            sql = `SELECT *
+            sql = `SELECT TOP ${offset + limit} *
                    FROM (${sql}) AS PAGINATION_TEMP_TABLE`
-            if (limit !== undefined)
-                sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`
-            else
-                sql += ` WHERE __PAGINATION_ROW_NUMBER__ > ${offset}`
+
+            sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`
             sql += " ORDER BY __PAGINATION_ROW_NUMBER__"
         } else {
             sql += this.createOrderByExpression()
-
-            if (!isLegacyMsSql)
-                sql += this.createLimitOffsetExpression()
+            sql += this.createLimitOffsetExpression()
         }
         sql += this.createLockExpression()
         sql = sql.trim()
