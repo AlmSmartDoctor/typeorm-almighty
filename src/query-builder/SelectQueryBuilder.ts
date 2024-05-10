@@ -106,8 +106,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
             offset = offset === undefined ? 0 : offset
             limit = limit === undefined ? 99999 : limit
 
-            sql += this.createOrderByExpression()
-            sql = `SELECT TOP ${offset + limit} *
+            sql = `SELECT *
                    FROM (${sql}) AS PAGINATION_TEMP_TABLE`
 
             sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`
