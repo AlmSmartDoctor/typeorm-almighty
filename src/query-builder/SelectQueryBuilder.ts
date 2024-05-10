@@ -2139,14 +2139,6 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
         const allSelects: SelectQuery[] = []
         const excludedSelects: SelectQuery[] = []
 
-        if (selectRowNumber) {
-            const isOrderByEmpty = Object.keys(this.expressionMap.orderBys).length === 0;
-            allSelects.push({
-                aliasName: "__PAGINATION_ROW_NUMBER__",
-                selection: `ROW_NUMBER() OVER(${isOrderByEmpty ? "ORDER BY (SELECT NULL)" : this.createOrderByExpression()})`,
-                virtual: false
-            });
-        }
 
         if (this.expressionMap.mainAlias.hasMetadata) {
             const metadata = this.expressionMap.mainAlias.metadata
@@ -2207,6 +2199,15 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
 
         // if still selection is empty, then simply set it to all (*)
         if (allSelects.length === 0) allSelects.push({selection: "*"})
+
+        if (selectRowNumber) {
+            const isOrderByEmpty = Object.keys(this.expressionMap.orderBys).length === 0;
+            allSelects.push({
+                aliasName: "__PAGINATION_ROW_NUMBER__",
+                selection: `ROW_NUMBER() OVER(${isOrderByEmpty ? "ORDER BY (SELECT NULL)" : this.createOrderByExpression()})`,
+                virtual: false
+            });
+        }
 
         // Use certain index
         let useIndex: string = ""
