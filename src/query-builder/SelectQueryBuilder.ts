@@ -104,12 +104,15 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
 
         if (isLegacyMsSql && (offset !== undefined || limit !== undefined)) {
             offset = offset === undefined ? 0 : offset
-            limit = limit === undefined ? 99999 : limit
 
             sql = `SELECT *
                    FROM (${sql}) AS PAGINATION_TEMP_TABLE`
 
-            sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`
+            if(limit === undefined)
+                sql += ` WHERE __PAGINATION_ROW_NUMBER__ > ${offset}`
+            else
+                sql += ` WHERE __PAGINATION_ROW_NUMBER__ BETWEEN ${offset + 1} AND ${offset + limit}`
+
             sql += " ORDER BY __PAGINATION_ROW_NUMBER__"
         } else {
             sql += this.createOrderByExpression()
